@@ -2,6 +2,7 @@ package
 {
 import flash.events.MouseEvent;
 
+import starling.animation.DelayedCall;
 import starling.core.Starling;
 import starling.display.Button;
 import starling.display.Quad;
@@ -14,20 +15,37 @@ import starling.textures.Texture;
  */
 public class Main extends Sprite
 {
-    private var list:Array =
-        [100, 200, 200, 200, 300, 300, 100, 400, 400, 200,
-        300, 300, 150, 200, 130, 300, 110, 213, 124, 21];
+    private var count:int = 20;
+    private var list:Array = [];
     private var listView:Sprite;
     private var sortAlgo:BubbleSort;
     private var currentFrame:int = 0;
     private var bar1:Quad;
     private var bar2:Quad;
+    private var delayCall:DelayedCall;
 
     public function Main()
     {
         super();
         initListView();
-        initButton();
+        initButtons();
+        reset();
+    }
+    
+    public function reset(...rest):void
+    {
+        bar1 && (bar1.color = 0, bar1.alpha = 1);
+        bar2 && (bar2.color = 0, bar2.alpha = 1);
+        delayCall && (Starling.juggler.remove(delayCall), delayCall == null);
+        currentFrame = 0;
+        
+        // Init list data by random number.
+        list = [];
+        for (var n:int = 0; n < 20; n++) 
+        {
+            list.push(int(Math.random() * 500));
+            listView.getChildAt(n).height = list[n];
+        }
     }
 
     public function initListView():void
@@ -35,36 +53,34 @@ public class Main extends Sprite
         listView = new Sprite;
         addChild(listView);
 
-        var rect:Quad;
-        for (var i:int = 0; i < list.length; i++)
+        for (var i:int = 0; i < count; i++)
         {
-            rect = drawBar(i, 100, 0);
-            rect.height = list[i];
-            listView.addChild(rect);
+            listView.addChild(new Quad(20, 100, 0)).x = i * 22;
         }
     }
 
-    public function initButton():void
+    public function initButtons():void
     {
-        var btn:Button = new Button(Texture.fromColor(100, 50, 0xFFAAAAFF), 'Sort');
-        addChild(btn);
-        btn.x = listView.width + 30;
-        btn.y = 5;
-        btn.addEventListener(Event.TRIGGERED, sort);
+        var sortBtn:Button = new Button(Texture.fromColor(100, 50, 0xFFAAAAFF), 'Sort');
+        addChild(sortBtn);
+        sortBtn.x = listView.width + 30;
+        sortBtn.y = 5;
+        sortBtn.addEventListener(Event.TRIGGERED, sort);
+        
+        var resetBtn:Button = new Button(Texture.fromColor(100, 50, 0xFFFFAAAA), 'Reset');
+        addChild(resetBtn);
+        resetBtn.x = listView.width + 30;
+        resetBtn.y = 60;
+        resetBtn.addEventListener(Event.TRIGGERED, reset);
     }
 
     public function sort(... rest):void
     {
         sortAlgo = new BubbleSort;
         sortAlgo.sort(list);
-        playAnimation();
-    }
-
-    public function playAnimation():void
-    {
         step();
     }
-
+    
     public function step():void
     {
         var data:Object = sortAlgo.processData[currentFrame];
@@ -85,7 +101,7 @@ public class Main extends Sprite
         if (currentFrame < sortAlgo.processData.length - 1)
         {
             currentFrame++;
-            Starling.juggler.delayCall(step, 0.2);
+            delayCall = Starling.juggler.delayCall(step, 0.2);
         }
         else
         {
@@ -94,12 +110,5 @@ public class Main extends Sprite
         }
     }
 
-    public function drawBar(index:int, value:Number, color:uint):Quad
-    {
-        var rect:Quad = new Quad(20, value, color);
-        rect.x = index * 22;
-        addChild(rect);
-        return rect;
-    }
 }
 }
