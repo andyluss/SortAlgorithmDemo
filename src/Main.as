@@ -32,7 +32,7 @@ public class Main extends Sprite
         reset();
     }
     
-    public function reset(...rest):void
+    public function reset():void
     {
         bar1 && (bar1.color = 0, bar1.alpha = 1);
         bar2 && (bar2.color = 0, bar2.alpha = 1);
@@ -74,7 +74,7 @@ public class Main extends Sprite
         resetBtn.addEventListener(Event.TRIGGERED, reset);
     }
 
-    public function sort(... rest):void
+    public function sort():void
     {
         sortAlgo = new BubbleSort;
         sortAlgo.sort(list);

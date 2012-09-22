@@ -15,7 +15,7 @@ import starling.core.Starling;
 public class SortAlgorithmDemo extends Sprite
 {
     private var iStarling:Starling;
-    private var mainView:Main;
+    private var main:Main;
     
     public function SortAlgorithmDemo()
     {
